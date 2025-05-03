@@ -1,10 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/player/models/player.dart';
+import 'features/player/models/player_repository.dart';
+import 'features/team/models/team.dart';
+import 'features/team/models/team_repository.dart';
 
-void main() {
-  runApp(const ProviderScope(child: TeamManagerApp()));
+void main() async {
+  // Ensure Flutter is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Hive
+  final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
+  await Hive.initFlutter(appDocumentDir.path);
+  
+  // Register Hive adapters
+  Hive.registerAdapter(PlayerAdapter());
+  Hive.registerAdapter(PlayerPositionAdapter());
+  Hive.registerAdapter(TeamAdapter());
+  
+  // Initialize the repositories
+  final playerRepository = HivePlayerRepository();
+  await playerRepository.initialize();
+  
+  final teamRepository = HiveTeamRepository();
+  await teamRepository.initialize();
+  
+  // Run the app
+  runApp(
+    ProviderScope(
+      overrides: [
+        // Override the repository providers with our initialized instances
+        playerRepositoryProvider.overrideWithValue(playerRepository),
+        teamRepositoryProvider.overrideWithValue(teamRepository),
+      ],
+      child: const TeamManagerApp(),
+    ),
+  );
 }
 
 class TeamManagerApp extends ConsumerWidget {

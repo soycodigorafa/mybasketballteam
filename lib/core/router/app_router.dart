@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/player/views/player_list_view.dart';
+import '../../features/player/views/players_screen.dart';
+import '../../features/team/views/teams_screen.dart';
 
 /// Provider for the application router
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -14,7 +15,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         name: 'home',
-        builder: (context, state) => const PlayerListView(),
+        builder: (context, state) => const TeamsScreen(),
+      ),
+      GoRoute(
+        path: '/team/:teamId/players',
+        name: 'players',
+        builder: (context, state) => PlayersScreen(
+          teamId: state.pathParameters['teamId'] ?? '',
+        ),
       ),
     ],
   );

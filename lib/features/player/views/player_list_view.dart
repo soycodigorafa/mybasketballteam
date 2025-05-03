@@ -59,10 +59,10 @@ class PlayerListTile extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          '${player.position} | #${player.number}',
+          '${player.position.displayName} | #${player.number}',
         ),
         trailing: Text(
-          '${player.height.toInt()} cm | ${player.weight.toInt()} kg',
+          _buildPhysicalStats(),
           style: TextStyle(
             color: Theme.of(context).colorScheme.secondary,
           ),
@@ -72,6 +72,12 @@ class PlayerListTile extends StatelessWidget {
         },
       ),
     );
+  }
+  
+  String _buildPhysicalStats() {
+    final height = player.height != null ? '${player.height!.toInt()} cm' : '-- cm';
+    final weight = player.weight != null ? '${player.weight!.toInt()} kg' : '-- kg';
+    return '$height | $weight';
   }
 
   Widget _buildPlayerAvatar() {
