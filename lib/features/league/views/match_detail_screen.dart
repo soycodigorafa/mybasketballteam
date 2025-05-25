@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../models/match.dart';
+import '../models/match_repository.dart';
 import '../view_models/matches_view_model.dart';
 
 /// Screen that displays detailed match information
@@ -19,15 +20,23 @@ class MatchDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final match = ref.watch(matchByIdProvider(matchId));
-    final league = ref.watch(leagueByIdProvider(leagueId));
+    // Use the matchesProvider to find the match by ID
+    final allMatches = ref.watch(matchesProvider);
+    late final Match match;
     
-    if (match == null) {
+    try {
+      match = allMatches.firstWhere(
+        (m) => m.id == matchId,
+      );
+    } catch (e) {
+      // Match not found
       return Scaffold(
         appBar: AppBar(title: const Text('Match Details')),
         body: const Center(child: Text('Match not found')),
       );
     }
+    
+    final league = ref.watch(leagueByIdProvider(leagueId));
 
     return Scaffold(
       appBar: AppBar(

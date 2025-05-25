@@ -1,51 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import '../models/match.dart';
+import '../models/match_repository.dart';
 import '../../team/models/league.dart';
-import '../../team/view_models/teams_view_model.dart';
+import '../../team/models/team_repository.dart';
 
-const String _matchesBoxName = 'matches';
-
-/// Repository provider for matches
-final matchesRepositoryProvider = Provider<MatchesRepository>((ref) {
-  return MatchesRepository();
-});
-
-/// Provider for all matches
-final matchesProvider = Provider<List<Match>>((ref) {
-  final repository = ref.watch(matchesRepositoryProvider);
-  return repository.getAllMatches();
-});
-
-/// Provider for matches by league ID
-final matchesByLeagueProvider = Provider.family<AsyncValue<List<Match>>, String>((ref, leagueId) {
-  try {
-    // Check if Hive box is open first
-    if (!Hive.isBoxOpen(_matchesBoxName)) {
-      // Return loading state if box is not available yet
-      return const AsyncValue.loading();
-    }
-    
-    final matches = ref.watch(matchesProvider);
-    final leagueMatches = matches.where((match) => match.leagueId == leagueId).toList();
-    // Sort by date descending (newest first)
-    leagueMatches.sort((a, b) => b.date.compareTo(a.date));
-    return AsyncValue.data(leagueMatches);
-  } catch (e, stackTrace) {
-    return AsyncValue.error(e, stackTrace);
-  }
-});
-
-/// Provider for a match by ID
-final matchByIdProvider = Provider.family<Match?, String>((ref, matchId) {
-  final matches = ref.watch(matchesProvider);
-  try {
-    return matches.firstWhere(
-      (match) => match.id == matchId,
-    );
-  } catch (e) {
-    return null;
-  }
+/// Provider for sorted matches by league ID
+final sortedMatchesByLeagueProvider = Provider.family<List<Match>, String>((ref, leagueId) {
+  final matches = ref.watch(matchesByLeagueProvider(leagueId));
+  // Sort by date descending (newest first)
+  matches.sort((a, b) => b.date.compareTo(a.date));
+  return matches;
 });
 
 /// Provider for leagues with their associated match count
@@ -65,116 +29,41 @@ final leagueByIdProvider = Provider.family<League?, String>((ref, leagueId) {
 });
 
 /// Provider for the matches view model
-final matchesViewModelProvider = StateNotifierProvider<MatchesViewModel, AsyncValue<List<Match>>>((ref) {
-  final repository = ref.watch(matchesRepositoryProvider);
+final matchesViewModelProvider = StateNotifierProvider<MatchesViewModel, List<Match>>((ref) {
+  final repository = ref.watch(matchRepositoryProvider);
   return MatchesViewModel(repository);
 });
 
-/// Repository for matches data
-class MatchesRepository {
-  /// Safely get or open the matches box
-  Future<Box<Match>> _getBox() async {
-    if (Hive.isBoxOpen(_matchesBoxName)) {
-      return Hive.box<Match>(_matchesBoxName);
-    } else {
-      return await Hive.openBox<Match>(_matchesBoxName);
-    }
-  }
 
-  /// Get all matches
-  List<Match> getAllMatches() {
-    try {
-      final box = Hive.isBoxOpen(_matchesBoxName) 
-          ? Hive.box<Match>(_matchesBoxName) 
-          : throw Exception('Matches box not initialized yet');
-      return box.values.toList();
-    } catch (e) {
-      // Return empty list if box can't be accessed
-      return [];
-    }
-  }
-  
-  /// Get a match by ID
-  Match? getMatchById(String id) {
-    try {
-      final box = Hive.isBoxOpen(_matchesBoxName) 
-          ? Hive.box<Match>(_matchesBoxName) 
-          : throw Exception('Matches box not initialized yet');
-      return box.values.firstWhere(
-        (match) => match.id == id,
-      );
-    } catch (e) {
-      return null;
-    }
-  }
-  
-  /// Add a new match
-  Future<void> addMatch(Match match) async {
-    final box = await _getBox();
-    await box.put(match.id, match);
-  }
-  
-  /// Update an existing match
-  Future<void> updateMatch(Match match) async {
-    final box = await _getBox();
-    await box.put(match.id, match);
-  }
-  
-  /// Delete a match
-  Future<void> deleteMatch(String id) async {
-    final box = await _getBox();
-    await box.delete(id);
-  }
-}
 
 /// ViewModel for matches
-class MatchesViewModel extends StateNotifier<AsyncValue<List<Match>>> {
-  final MatchesRepository _repository;
+class MatchesViewModel extends StateNotifier<List<Match>> {
+  final MatchRepository _repository;
   
-  MatchesViewModel(this._repository) : super(const AsyncValue.loading()) {
+  MatchesViewModel(this._repository) : super([]) {
     _loadMatches();
   }
   
   /// Load all matches
-  Future<void> _loadMatches() async {
-    try {
-      final matches = _repository.getAllMatches();
-      state = AsyncValue.data(matches);
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-    }
+  void _loadMatches() {
+    state = _repository.getAllMatches();
   }
   
   /// Add a new match
   Future<void> addMatch(Match match) async {
-    state = const AsyncValue.loading();
-    try {
-      await _repository.addMatch(match);
-      _loadMatches();
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-    }
+    await _repository.addMatch(match);
+    _loadMatches();
   }
   
   /// Update an existing match
   Future<void> updateMatch(Match match) async {
-    state = const AsyncValue.loading();
-    try {
-      await _repository.updateMatch(match);
-      _loadMatches();
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-    }
+    await _repository.updateMatch(match);
+    _loadMatches();
   }
   
   /// Delete a match
   Future<void> deleteMatch(String id) async {
-    state = const AsyncValue.loading();
-    try {
-      await _repository.deleteMatch(id);
-      _loadMatches();
-    } catch (e, stackTrace) {
-      state = AsyncValue.error(e, stackTrace);
-    }
+    await _repository.deleteMatch(id);
+    _loadMatches();
   }
 }

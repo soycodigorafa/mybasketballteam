@@ -1,42 +1,17 @@
-import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-part 'match.g.dart';
-
 /// Represents a basketball match between two teams
-@HiveType(typeId: 4)
 class Match {
-  @HiveField(0)
   final String id;
-  
-  @HiveField(1)
   final String leagueId;
-  
-  @HiveField(2)
   final String homeTeamId;
-  
-  @HiveField(3)
   final String homeTeamName;
-  
-  @HiveField(4)
   final int homeTeamScore;
-  
-  @HiveField(5)
   final String awayTeamId;
-  
-  @HiveField(6)
   final String awayTeamName;
-  
-  @HiveField(7)
   final int awayTeamScore;
-  
-  @HiveField(8)
   final DateTime date;
-  
-  @HiveField(9)
   final String? location;
-  
-  @HiveField(10)
   final String? notes;
 
   Match({

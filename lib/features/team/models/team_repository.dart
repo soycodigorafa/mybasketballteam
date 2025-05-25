@@ -1,9 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'team.dart';
-import 'team_stats.dart';
-import 'league.dart';
 
 /// Abstract repository interface for managing team data
 abstract class TeamRepository {
@@ -23,79 +19,75 @@ abstract class TeamRepository {
   Future<void> deleteTeam(String id);
 }
 
-/// Hive implementation of TeamRepository for persistent storage
-class HiveTeamRepository implements TeamRepository {
-  static const String _boxName = 'teams';
-  late Box<Team> _teamsBox;
+/// In-memory implementation of TeamRepository
+class InMemoryTeamRepository implements TeamRepository {
+  // In-memory storage for teams
+  final Map<String, Team> _teams = {};
 
-  /// Initialize the Hive box
-  Future<void> initialize() async {
-    // Register adapters if they haven't been registered yet
-    if (!Hive.isAdapterRegistered(3)) {
-      Hive.registerAdapter(LeagueAdapter());
-    }
+  InMemoryTeamRepository() {
+    // Initialize with sample data
+    final sampleTeams = [
+      Team(
+        name: 'Lakers',
+        description: 'Los Angeles Lakers basketball team',
+        coachName: 'Frank Vogel',
+        logoUrl: 'https://example.com/lakers.png',
+      ),
+      Team(
+        name: 'Warriors',
+        description: 'Golden State Warriors basketball team',
+        coachName: 'Steve Kerr',
+        logoUrl: 'https://example.com/warriors.png',
+      ),
+    ];
 
-    if (!Hive.isAdapterRegistered(4)) {
-      Hive.registerAdapter(TeamStatsAdapter());
-    }
-
-    if (!Hive.isBoxOpen(_boxName)) {
-      _teamsBox = await Hive.openBox<Team>(_boxName);
-
-      // Add sample data if the box is empty
-      if (_teamsBox.isEmpty) {
-        final sampleTeams = [
-          Team(
-            name: 'Lakers',
-            description: 'Los Angeles Lakers basketball team',
-            coachName: 'Frank Vogel',
-            logoUrl: 'https://example.com/lakers.png',
-          ),
-          Team(
-            name: 'Warriors',
-            description: 'Golden State Warriors basketball team',
-            coachName: 'Steve Kerr',
-            logoUrl: 'https://example.com/warriors.png',
-          ),
-        ];
-
-        for (final team in sampleTeams) {
-          await _teamsBox.put(team.id, team);
-        }
-      }
-    } else {
-      _teamsBox = Hive.box<Team>(_boxName);
+    for (final team in sampleTeams) {
+      _teams[team.id] = team;
     }
   }
 
   @override
   List<Team> getAllTeams() {
-    return _teamsBox.values.toList();
+    return _teams.values.toList();
   }
 
   @override
   Team? getTeamById(String id) {
-    return _teamsBox.get(id);
+    return _teams[id];
   }
 
   @override
   Future<void> addTeam(Team team) async {
-    await _teamsBox.put(team.id, team);
+    _teams[team.id] = team;
   }
 
   @override
   Future<void> updateTeam(Team team) async {
-    await _teamsBox.put(team.id, team);
+    if (_teams.containsKey(team.id)) {
+      _teams[team.id] = team;
+    }
   }
 
   @override
   Future<void> deleteTeam(String id) async {
-    await _teamsBox.delete(id);
+    _teams.remove(id);
   }
 }
 
 /// Provider for the TeamRepository
 final teamRepositoryProvider = Provider<TeamRepository>((ref) {
-  // Use HiveTeamRepository for persistent storage
-  return HiveTeamRepository();
+  // Use InMemoryTeamRepository for temporary storage
+  return InMemoryTeamRepository();
+});
+
+/// Provider for the current list of teams
+final teamsProvider = Provider<List<Team>>((ref) {
+  final repository = ref.watch(teamRepositoryProvider);
+  return repository.getAllTeams();
+});
+
+/// Provider for a specific team by ID
+final teamByIdProvider = Provider.family<Team?, String>((ref, id) {
+  final repository = ref.watch(teamRepositoryProvider);
+  return repository.getTeamById(id);
 });

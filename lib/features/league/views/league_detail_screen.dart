@@ -20,7 +20,7 @@ class LeagueDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Get the league information
     final league = ref.watch(leagueByIdProvider(leagueId));
-    final matchesAsyncValue = ref.watch(matchesByLeagueProvider(leagueId));
+    final matches = ref.watch(sortedMatchesByLeagueProvider(leagueId));
 
     return Scaffold(
       appBar: AppBar(
@@ -29,7 +29,7 @@ class LeagueDetailScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () async {
           // Refresh matches data
-          ref.invalidate(matchesByLeagueProvider(leagueId));
+          ref.invalidate(sortedMatchesByLeagueProvider(leagueId));
           return Future.value();
         },
         child: SingleChildScrollView(
@@ -44,7 +44,7 @@ class LeagueDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
                 
                 // Matches section
-                _buildMatchesSection(context, ref, matchesAsyncValue),
+                _buildMatchesSection(context, ref, matches),
               ],
             ),
           ),
@@ -112,7 +112,7 @@ class LeagueDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMatchesSection(BuildContext context, WidgetRef ref, AsyncValue<List<Match>> matchesAsyncValue) {
+  Widget _buildMatchesSection(BuildContext context, WidgetRef ref, List<Match> matches) {
     final theme = Theme.of(context);
 
     return Card(
@@ -133,39 +133,30 @@ class LeagueDetailScreen extends ConsumerWidget {
               ],
             ),
             const Divider(),
-            matchesAsyncValue.when(
-              data: (matches) {
-                if (matches.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16.0),
-                    child: Center(
-                      child: Text('No matches found for this league'),
+            if (matches.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: Center(
+                  child: Text('No matches found for this league'),
+                ),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: matches.length,
+                itemBuilder: (context, index) {
+                  final match = matches[index];
+                  return ListTile(
+                    title: Text('${match.homeTeamName} vs ${match.awayTeamName}'),
+                    subtitle: Text(
+                      'Date: ${_formatDate(match.date)} - Score: ${match.homeTeamScore} - ${match.awayTeamScore}',
                     ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _navigateToMatchDetail(context, match.id),
                   );
-                }
-                
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: matches.length,
-                  itemBuilder: (context, index) {
-                    final match = matches[index];
-                    return ListTile(
-                      title: Text('${match.homeTeamName} vs ${match.awayTeamName}'),
-                      subtitle: Text(
-                        'Date: ${_formatDate(match.date)} - Score: ${match.homeTeamScore} - ${match.awayTeamScore}',
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => _navigateToMatchDetail(context, match.id),
-                    );
-                  },
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stackTrace) => Center(
-                child: Text('Error loading matches: $error'),
+                },
               ),
-            ),
           ],
         ),
       ),
