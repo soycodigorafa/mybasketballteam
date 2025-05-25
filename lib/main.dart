@@ -8,11 +8,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Run the app with Riverpod for state management
-  runApp(
-    const ProviderScope(
-      child: TeamManagerApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: TeamManagerApp()));
 }
 
 class TeamManagerApp extends ConsumerWidget {

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../team/models/league.dart';
-import '../models/match.dart';
-import '../view_models/matches_view_model.dart';
+import '../../match/models/match.dart';
+import '../../match/view_models/matches_view_model.dart';
 
 /// Screen that displays detailed league information and matches
-class LeagueDetailScreen extends ConsumerWidget {
+class LeagueDetailScreen extends ConsumerStatefulWidget {
   final String leagueId;
   final String teamId;
 
@@ -17,19 +17,55 @@ class LeagueDetailScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LeagueDetailScreen> createState() => _LeagueDetailScreenState();
+}
+
+class _LeagueDetailScreenState extends ConsumerState<LeagueDetailScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh data when dependencies change
+    _refreshData();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Refresh data when app resumes
+    if (state == AppLifecycleState.resumed) {
+      _refreshData();
+    }
+  }
+
+  void _refreshData() {
+    // Invalidate the match providers to force a refresh
+    ref.invalidate(sortedMatchesByLeagueProvider(widget.leagueId));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Get the league information
-    final league = ref.watch(leagueByIdProvider(leagueId));
-    final matches = ref.watch(sortedMatchesByLeagueProvider(leagueId));
+    final league = ref.watch(leagueByIdProvider(widget.leagueId));
+    final matches = ref.watch(sortedMatchesByLeagueProvider(widget.leagueId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(league?.name ?? 'League Details'),
-      ),
+      appBar: AppBar(title: Text(league?.name ?? 'League Details')),
       body: RefreshIndicator(
         onRefresh: () async {
           // Refresh matches data
-          ref.invalidate(sortedMatchesByLeagueProvider(leagueId));
+          ref.invalidate(sortedMatchesByLeagueProvider(widget.leagueId));
           return Future.value();
         },
         child: SingleChildScrollView(
@@ -39,12 +75,18 @@ class LeagueDetailScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // League info header
-                _buildLeagueHeader(context, league),
-                
+                LeagueHeader(league: league),
+
                 const SizedBox(height: 24),
-                
+
                 // Matches section
-                _buildMatchesSection(context, ref, matches),
+                MatchesSection(
+                  matches: matches,
+                  onAddMatch: () => _navigateToAddMatch(context),
+                  onMatchTap:
+                      (matchId) => _navigateToMatchDetail(context, matchId),
+                  formatDate: _formatDate,
+                ),
               ],
             ),
           ),
@@ -57,9 +99,39 @@ class LeagueDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLeagueHeader(BuildContext context, League? league) {
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  void _navigateToAddMatch(BuildContext context) {
+    context.pushNamed(
+      'addMatch',
+      pathParameters: {'leagueId': widget.leagueId, 'teamId': widget.teamId},
+    );
+  }
+
+  void _navigateToMatchDetail(BuildContext context, String matchId) {
+    context.pushNamed(
+      'matchDetail',
+      pathParameters: {
+        'matchId': matchId,
+        'leagueId': widget.leagueId,
+        'teamId': widget.teamId,
+      },
+    );
+  }
+}
+
+/// Widget that displays the league header information
+class LeagueHeader extends StatelessWidget {
+  final League? league;
+
+  const LeagueHeader({super.key, required this.league});
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     if (league == null) {
       return const Card(
         child: Padding(
@@ -77,10 +149,10 @@ class LeagueDetailScreen extends ConsumerWidget {
           children: [
             Row(
               children: [
-                if (league.logoUrl != null)
+                if (league?.logoUrl != null)
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(league.logoUrl!),
+                    backgroundImage: NetworkImage(league!.logoUrl!),
                   )
                 else
                   const CircleAvatar(
@@ -92,10 +164,7 @@ class LeagueDetailScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        league.name,
-                        style: theme.textTheme.headlineSmall,
-                      ),
+                      Text(league!.name, style: theme.textTheme.headlineSmall),
                       const SizedBox(height: 4),
                       Text(
                         'Season 2024-2025',
@@ -111,8 +180,25 @@ class LeagueDetailScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildMatchesSection(BuildContext context, WidgetRef ref, List<Match> matches) {
+/// Widget that displays the matches section
+class MatchesSection extends StatelessWidget {
+  final List<Match> matches;
+  final VoidCallback onAddMatch;
+  final Function(String) onMatchTap;
+  final String Function(DateTime) formatDate;
+
+  const MatchesSection({
+    super.key,
+    required this.matches,
+    required this.onAddMatch,
+    required this.onMatchTap,
+    required this.formatDate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Card(
@@ -128,7 +214,7 @@ class LeagueDetailScreen extends ConsumerWidget {
                 TextButton.icon(
                   icon: const Icon(Icons.add),
                   label: const Text('Add Match'),
-                  onPressed: () => _navigateToAddMatch(context),
+                  onPressed: onAddMatch,
                 ),
               ],
             ),
@@ -136,55 +222,52 @@ class LeagueDetailScreen extends ConsumerWidget {
             if (matches.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16.0),
-                child: Center(
-                  child: Text('No matches found for this league'),
-                ),
+                child: Center(child: Text('No matches found for this league')),
               )
             else
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: matches.length,
-                itemBuilder: (context, index) {
-                  final match = matches[index];
-                  return ListTile(
-                    title: Text('${match.homeTeamName} vs ${match.awayTeamName}'),
-                    subtitle: Text(
-                      'Date: ${_formatDate(match.date)} - Score: ${match.homeTeamScore} - ${match.awayTeamScore}',
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => _navigateToMatchDetail(context, match.id),
-                  );
-                },
+              SizedBox(
+                height: matches.length * 72.0, // Estimated height per list item
+                child: ListView.builder(
+                  itemCount: matches.length,
+                  itemBuilder: (context, index) {
+                    final match = matches[index];
+                    return MatchListItem(
+                      match: match,
+                      formatDate: formatDate,
+                      onTap: () => onMatchTap(match.id),
+                    );
+                  },
+                ),
               ),
           ],
         ),
       ),
     );
   }
+}
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
+/// Widget that displays a single match item in the list
+class MatchListItem extends StatelessWidget {
+  final Match match;
+  final String Function(DateTime) formatDate;
+  final VoidCallback onTap;
 
-  void _navigateToAddMatch(BuildContext context) {
-    context.pushNamed(
-      'addMatch',
-      pathParameters: {
-        'leagueId': leagueId,
-        'teamId': teamId,
-      },
-    );
-  }
+  const MatchListItem({
+    super.key,
+    required this.match,
+    required this.formatDate,
+    required this.onTap,
+  });
 
-  void _navigateToMatchDetail(BuildContext context, String matchId) {
-    context.pushNamed(
-      'matchDetail',
-      pathParameters: {
-        'matchId': matchId,
-        'leagueId': leagueId,
-        'teamId': teamId,
-      },
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text('${match.homeTeamName} vs ${match.awayTeamName}'),
+      subtitle: Text(
+        'Date: ${formatDate(match.date)} - Score: ${match.homeTeamScore} - ${match.awayTeamScore}',
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
     );
   }
 }

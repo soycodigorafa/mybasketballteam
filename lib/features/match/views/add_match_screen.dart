@@ -123,20 +123,15 @@ class _AddMatchScreenState extends ConsumerState<AddMatchScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Away team input field
+                      // Away team name (text field)
                       TextFormField(
                         decoration: const InputDecoration(
                           labelText: 'Away Team Name',
                           border: OutlineInputBorder(),
-                          hintText: 'Enter the name of the opponent team',
                         ),
-                        initialValue: _awayTeamName,
                         onChanged: (value) {
                           setState(() {
                             _awayTeamName = value;
-                            _awayTeamId = 'manual_entry';
-                            _isHomeTeam =
-                                true; // Always set the user's team as home when using manual entry
                           });
                         },
                         validator: (value) {
@@ -153,72 +148,106 @@ class _AddMatchScreenState extends ConsumerState<AddMatchScreen> {
 
               const SizedBox(height: 16),
 
-              // Score and Date
+              // Score
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Match Details', style: theme.textTheme.titleLarge),
+                      Text('Score', style: theme.textTheme.titleLarge),
                       const SizedBox(height: 16),
 
-                      // Score inputs
                       Row(
                         children: [
                           Expanded(
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                labelText: '${_homeTeamName} Score',
-                                border: const OutlineInputBorder(),
-                              ),
-                              keyboardType: TextInputType.number,
-                              initialValue: _homeTeamScore.toString(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _homeTeamScore = int.tryParse(value) ?? 0;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required';
-                                }
-                                if (int.tryParse(value) == null) {
-                                  return 'Enter valid number';
-                                }
-                                return null;
-                              },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Home Team'),
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                    labelText: 'Score',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  initialValue: _homeTeamScore.toString(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _homeTeamScore = int.tryParse(value) ?? 0;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Required';
+                                    }
+                                    if (int.tryParse(value) == null) {
+                                      return 'Enter a number';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          const Text(
+                            'VS',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
                             ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
-                            child: TextFormField(
-                              decoration: InputDecoration(
-                                labelText:
-                                    '${_awayTeamName.isNotEmpty ? _awayTeamName : "Away Team"} Score',
-                                border: const OutlineInputBorder(),
-                              ),
-                              keyboardType: TextInputType.number,
-                              initialValue: _awayTeamScore.toString(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _awayTeamScore = int.tryParse(value) ?? 0;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required';
-                                }
-                                if (int.tryParse(value) == null) {
-                                  return 'Enter valid number';
-                                }
-                                return null;
-                              },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Away Team'),
+                                const SizedBox(height: 8),
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                    labelText: 'Score',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  initialValue: _awayTeamScore.toString(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _awayTeamScore = int.tryParse(value) ?? 0;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Required';
+                                    }
+                                    if (int.tryParse(value) == null) {
+                                      return 'Enter a number';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
+                    ],
+                  ),
+                ),
+              ),
 
+              const SizedBox(height: 16),
+
+              // Details
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Details', style: theme.textTheme.titleLarge),
                       const SizedBox(height: 16),
 
                       // Date picker

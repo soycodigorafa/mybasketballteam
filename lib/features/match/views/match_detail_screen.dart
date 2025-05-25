@@ -23,11 +23,9 @@ class MatchDetailScreen extends ConsumerWidget {
     // Use the matchesProvider to find the match by ID
     final allMatches = ref.watch(matchesProvider);
     late final Match match;
-    
+
     try {
-      match = allMatches.firstWhere(
-        (m) => m.id == matchId,
-      );
+      match = allMatches.firstWhere((m) => m.id == matchId);
     } catch (e) {
       // Match not found
       return Scaffold(
@@ -35,7 +33,7 @@ class MatchDetailScreen extends ConsumerWidget {
         body: const Center(child: Text('Match not found')),
       );
     }
-    
+
     final league = ref.watch(leagueByIdProvider(leagueId));
 
     return Scaffold(
@@ -69,13 +67,12 @@ class MatchDetailScreen extends ConsumerWidget {
                       if (league != null)
                         Text(
                           league.name,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Teams and score
                       Row(
                         children: [
@@ -84,15 +81,17 @@ class MatchDetailScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   match.homeTeamName,
-                                  style: Theme.of(context).textTheme.titleMedium,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   match.homeTeamScore.toString(),
-                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.center,
                                 ),
                               ],
@@ -107,15 +106,17 @@ class MatchDetailScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   match.awayTeamName,
-                                  style: Theme.of(context).textTheme.titleMedium,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
                                   textAlign: TextAlign.center,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   match.awayTeamScore.toString(),
-                                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.center,
                                 ),
                               ],
@@ -123,63 +124,62 @@ class MatchDetailScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
-                      // Result
-                      Center(
+
+                      // Result text
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        decoration: BoxDecoration(
+                          color: _getResultColor(match, teamId),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
                         child: Text(
                           _getResultText(match, teamId),
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            color: _getResultColor(match, teamId),
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Match details card
               Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Match Details',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      // Date
+                child: Column(
+                  children: [
+                    // Date
+                    ListTile(
+                      leading: const Icon(Icons.calendar_today),
+                      title: const Text('Date'),
+                      subtitle: Text(_formatDate(match.date)),
+                    ),
+
+                    // Location
+                    if (match.location != null && match.location!.isNotEmpty)
                       ListTile(
-                        leading: const Icon(Icons.calendar_today),
-                        title: const Text('Date'),
-                        subtitle: Text(_formatDate(match.date)),
+                        leading: const Icon(Icons.location_on),
+                        title: const Text('Location'),
+                        subtitle: Text(match.location!),
                       ),
-                      
-                      // Location
-                      if (match.location != null && match.location!.isNotEmpty)
-                        ListTile(
-                          leading: const Icon(Icons.location_on),
-                          title: const Text('Location'),
-                          subtitle: Text(match.location!),
-                        ),
-                      
-                      // Notes
-                      if (match.notes != null && match.notes!.isNotEmpty)
-                        ListTile(
-                          leading: const Icon(Icons.notes),
-                          title: const Text('Notes'),
-                          subtitle: Text(match.notes!),
-                        ),
-                    ],
-                  ),
+
+                    // Notes
+                    if (match.notes != null && match.notes!.isNotEmpty)
+                      ListTile(
+                        leading: const Icon(Icons.notes),
+                        title: const Text('Notes'),
+                        subtitle: Text(match.notes!),
+                      ),
+                  ],
                 ),
               ),
             ],
@@ -196,7 +196,7 @@ class MatchDetailScreen extends ConsumerWidget {
   String _getResultText(Match match, String teamId) {
     bool isHomeTeam = match.homeTeamId == teamId;
     bool isAwayTeam = match.awayTeamId == teamId;
-    
+
     if (!isHomeTeam && !isAwayTeam) {
       // For matches where the user's team is not involved
       if (match.homeTeamScore > match.awayTeamScore) {
@@ -207,7 +207,7 @@ class MatchDetailScreen extends ConsumerWidget {
         return 'Draw';
       }
     }
-    
+
     // For matches involving the user's team
     if (isHomeTeam) {
       if (match.homeTeamScore > match.awayTeamScore) {
@@ -231,11 +231,11 @@ class MatchDetailScreen extends ConsumerWidget {
   Color _getResultColor(Match match, String teamId) {
     bool isHomeTeam = match.homeTeamId == teamId;
     bool isAwayTeam = match.awayTeamId == teamId;
-    
+
     if (!isHomeTeam && !isAwayTeam) {
       return Colors.grey; // Neutral color for non-team matches
     }
-    
+
     if (isHomeTeam) {
       if (match.homeTeamScore > match.awayTeamScore) {
         return Colors.green; // Win
@@ -270,7 +270,9 @@ class MatchDetailScreen extends ConsumerWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Match'),
-          content: const Text('Are you sure you want to delete this match? This action cannot be undone.'),
+          content: const Text(
+            'Are you sure you want to delete this match? This action cannot be undone.',
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -293,7 +295,7 @@ class MatchDetailScreen extends ConsumerWidget {
 
   void _deleteMatch(BuildContext context, WidgetRef ref, Match match) async {
     await ref.read(matchesViewModelProvider.notifier).deleteMatch(match.id);
-    
+
     if (context.mounted) {
       // Navigate back to the league screen
       context.pop();

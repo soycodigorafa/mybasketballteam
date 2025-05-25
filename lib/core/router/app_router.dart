@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../features/team/views/team_detail_screen.dart';
 import '../../features/team/views/teams_screen.dart';
 import '../../features/league/views/league_detail_screen.dart';
-import '../../features/league/views/add_match_screen.dart';
-import '../../features/league/views/match_detail_screen.dart';
+import '../../features/match/views/add_match_screen.dart';
+import '../../features/match/views/match_detail_screen.dart';
 
 /// Provider for the application router
 final appRouterProvider = Provider<GoRouter>((ref) {
