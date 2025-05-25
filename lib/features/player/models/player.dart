@@ -6,17 +6,17 @@ part 'player.g.dart';
 /// Basketball player positions
 @HiveType(typeId: 1)
 enum PlayerPosition {
-  @HiveField(0)
-  pointGuard,   // Base
   @HiveField(1)
-  shootingGuard, // Escolta
+  pointGuard, // Base
   @HiveField(2)
-  smallForward,  // Alero
+  shootingGuard, // Escolta
   @HiveField(3)
-  powerForward,  // Ala-Pivot
+  smallForward, // Alero
   @HiveField(4)
-  center;        // Pivot
-  
+  powerForward, // Ala-Pivot
+  @HiveField(5)
+  center; // Pivot
+
   String get displayName {
     switch (this) {
       case PlayerPosition.pointGuard:
@@ -31,11 +31,12 @@ enum PlayerPosition {
         return 'Center';
     }
   }
-  
+
   static PlayerPosition fromString(String value) {
     return PlayerPosition.values.firstWhere(
-      (position) => position.toString().split('.').last == value || 
-                    position.displayName == value,
+      (position) =>
+          position.toString().split('.').last == value ||
+          position.displayName == value,
       orElse: () => PlayerPosition.smallForward,
     );
   }
@@ -46,28 +47,28 @@ enum PlayerPosition {
 class Player {
   @HiveField(0)
   final String id;
-  
+
   @HiveField(1)
   final String name;
-  
+
   @HiveField(2)
   final int number;
-  
+
   @HiveField(3)
   final PlayerPosition position;
-  
+
   @HiveField(4)
   final String teamId;
-  
+
   @HiveField(5)
   final int? age;
-  
+
   @HiveField(6)
   final double? height; // in cm
-  
+
   @HiveField(7)
   final double? weight; // in kg
-  
+
   @HiveField(8)
   final String? photoUrl;
 

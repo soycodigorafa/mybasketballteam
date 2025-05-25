@@ -71,15 +71,15 @@ class PlayerPositionAdapter extends TypeAdapter<PlayerPosition> {
   @override
   PlayerPosition read(BinaryReader reader) {
     switch (reader.readByte()) {
-      case 0:
-        return PlayerPosition.pointGuard;
       case 1:
-        return PlayerPosition.shootingGuard;
+        return PlayerPosition.pointGuard;
       case 2:
-        return PlayerPosition.smallForward;
+        return PlayerPosition.shootingGuard;
       case 3:
-        return PlayerPosition.powerForward;
+        return PlayerPosition.smallForward;
       case 4:
+        return PlayerPosition.powerForward;
+      case 5:
         return PlayerPosition.center;
       default:
         return PlayerPosition.pointGuard;
@@ -90,19 +90,19 @@ class PlayerPositionAdapter extends TypeAdapter<PlayerPosition> {
   void write(BinaryWriter writer, PlayerPosition obj) {
     switch (obj) {
       case PlayerPosition.pointGuard:
-        writer.writeByte(0);
-        break;
-      case PlayerPosition.shootingGuard:
         writer.writeByte(1);
         break;
-      case PlayerPosition.smallForward:
+      case PlayerPosition.shootingGuard:
         writer.writeByte(2);
         break;
-      case PlayerPosition.powerForward:
+      case PlayerPosition.smallForward:
         writer.writeByte(3);
         break;
-      case PlayerPosition.center:
+      case PlayerPosition.powerForward:
         writer.writeByte(4);
+        break;
+      case PlayerPosition.center:
+        writer.writeByte(5);
         break;
     }
   }

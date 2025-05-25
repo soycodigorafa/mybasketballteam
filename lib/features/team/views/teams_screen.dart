@@ -61,8 +61,8 @@ class TeamCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
         onTap: () {
-          // Navigate to the players screen for this team
-          context.go('/team/${team.id}/players');
+          // Navigate to the team detail screen
+          context.go('/team/${team.id}');
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -129,8 +129,8 @@ class TeamCard extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.arrow_forward_ios),
                 onPressed: () {
-                  // Navigate to the players screen for this team
-                  context.go('/team/${team.id}/players');
+                  // Navigate to the team detail screen
+                  context.go('/team/${team.id}');
                 },
               ),
             ],

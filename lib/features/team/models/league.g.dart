@@ -1,53 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'team.dart';
+part of 'league.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class TeamAdapter extends TypeAdapter<Team> {
+class LeagueAdapter extends TypeAdapter<League> {
   @override
-  final int typeId = 2;
+  final int typeId = 3;
 
   @override
-  Team read(BinaryReader reader) {
+  League read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Team(
+    return League(
       id: fields[0] as String?,
       name: fields[1] as String,
       logoUrl: fields[2] as String?,
-      description: fields[3] as String?,
-      coachName: fields[4] as String?,
-      currentLeague: fields[5] as League?,
-      leagues: (fields[6] as List).cast<League>(),
-      stats: fields[7] as TeamStats?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Team obj) {
+  void write(BinaryWriter writer, League obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.logoUrl)
-      ..writeByte(3)
-      ..write(obj.description)
-      ..writeByte(4)
-      ..write(obj.coachName)
-      ..writeByte(5)
-      ..write(obj.currentLeague)
-      ..writeByte(6)
-      ..write(obj.leagues)
-      ..writeByte(7)
-      ..write(obj.stats);
+      ..write(obj.logoUrl);
   }
 
   @override
@@ -56,7 +41,7 @@ class TeamAdapter extends TypeAdapter<Team> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is TeamAdapter &&
+      other is LeagueAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

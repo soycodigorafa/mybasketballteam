@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'team.dart';
+import 'team_stats.dart';
 
 /// Abstract repository interface for managing team data
 abstract class TeamRepository {
@@ -28,6 +29,11 @@ class HiveTeamRepository implements TeamRepository {
   
   /// Initialize the Hive box
   Future<void> initialize() async {
+    // Register adapters if they haven't been registered yet
+    if (!Hive.isAdapterRegistered(4)) {
+      Hive.registerAdapter(TeamStatsAdapter());
+    }
+    
     if (!Hive.isBoxOpen(_boxName)) {
       _teamsBox = await Hive.openBox<Team>(_boxName);
       
