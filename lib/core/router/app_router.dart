@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/team/views/team_detail_screen.dart';
 import '../../features/team/views/teams_screen.dart';
+import '../../features/league/views/league_detail_screen.dart';
+import '../../features/league/views/add_match_screen.dart';
+import '../../features/league/views/match_detail_screen.dart';
 
 /// Provider for the application router
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -22,6 +25,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'teamDetail',
         builder: (context, state) => TeamDetailScreen(
           teamId: state.pathParameters['teamId'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: '/team/:teamId/league/:leagueId',
+        name: 'leagueDetail',
+        builder: (context, state) => LeagueDetailScreen(
+          teamId: state.pathParameters['teamId'] ?? '',
+          leagueId: state.pathParameters['leagueId'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: '/team/:teamId/league/:leagueId/addMatch',
+        name: 'addMatch',
+        builder: (context, state) => AddMatchScreen(
+          teamId: state.pathParameters['teamId'] ?? '',
+          leagueId: state.pathParameters['leagueId'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: '/team/:teamId/league/:leagueId/match/:matchId',
+        name: 'matchDetail',
+        builder: (context, state) => MatchDetailScreen(
+          teamId: state.pathParameters['teamId'] ?? '',
+          leagueId: state.pathParameters['leagueId'] ?? '',
+          matchId: state.pathParameters['matchId'] ?? '',
         ),
       ),
     ],

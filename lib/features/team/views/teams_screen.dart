@@ -15,20 +15,17 @@ class TeamsScreen extends ConsumerWidget {
     final teams = ref.watch(teamsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Basketball Teams'),
-      ),
-      body: teams.isEmpty
-          ? const Center(
-              child: Text('No teams yet. Add your first team!'),
-            )
-          : ListView.builder(
-              itemCount: teams.length,
-              itemBuilder: (context, index) {
-                final team = teams[index];
-                return TeamCard(team: team);
-              },
-            ),
+      appBar: AppBar(title: const Text('My Basketball Teams')),
+      body:
+          teams.isEmpty
+              ? const Center(child: Text('No teams yet. Add your first team!'))
+              : ListView.builder(
+                itemCount: teams.length,
+                itemBuilder: (context, index) {
+                  final team = teams[index];
+                  return TeamCard(team: team);
+                },
+              ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
@@ -48,21 +45,18 @@ class TeamsScreen extends ConsumerWidget {
 class TeamCard extends StatelessWidget {
   final Team team;
 
-  const TeamCard({
-    super.key,
-    required this.team,
-  });
+  const TeamCard({super.key, required this.team});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: InkWell(
         onTap: () {
           // Navigate to the team detail screen
-          context.go('/team/${team.id}');
+          context.push('/team/${team.id}');
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -76,23 +70,25 @@ class TeamCard extends StatelessWidget {
                   color: theme.colorScheme.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: team.logoUrl != null
-                    ? ClipOval(
-                        child: Image.network(
-                          team.logoUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            Icons.sports_basketball,
-                            color: theme.colorScheme.primary,
-                            size: 32,
+                child:
+                    team.logoUrl != null
+                        ? ClipOval(
+                          child: Image.network(
+                            team.logoUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) => Icon(
+                                  Icons.sports_basketball,
+                                  color: theme.colorScheme.primary,
+                                  size: 32,
+                                ),
                           ),
+                        )
+                        : Icon(
+                          Icons.sports_basketball,
+                          color: theme.colorScheme.primary,
+                          size: 32,
                         ),
-                      )
-                    : Icon(
-                        Icons.sports_basketball,
-                        color: theme.colorScheme.primary,
-                        size: 32,
-                      ),
               ),
               const SizedBox(width: 16),
               // Team details

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../models/team.dart';
 import '../models/league.dart';
 import '../models/team_stats.dart';
@@ -20,10 +21,13 @@ class TeamDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Use AsyncValue to handle loading states
-    final AsyncValue<Team?> teamAsyncValue = AsyncValue.data(ref.watch(teamByIdProvider(teamId)));
+    final AsyncValue<Team?> teamAsyncValue = AsyncValue.data(
+      ref.watch(teamByIdProvider(teamId)),
+    );
     final allPlayers = ref.watch(playersProvider);
-    final teamPlayers = allPlayers.where((player) => player.teamId == teamId).toList();
-    
+    final teamPlayers =
+        allPlayers.where((player) => player.teamId == teamId).toList();
+
     return teamAsyncValue.when(
       data: (team) {
         if (team == null) {
@@ -32,7 +36,7 @@ class TeamDetailScreen extends ConsumerWidget {
             body: const Center(child: Text('Team not found')),
           );
         }
-        
+
         return Scaffold(
           appBar: AppBar(
             title: Text(team.name),
@@ -58,27 +62,24 @@ class TeamDetailScreen extends ConsumerWidget {
                   children: [
                     // Team info section (name, logo, description, coach)
                     TeamInfoSection(team: team),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // League information
                     _buildLeagueSection(context, ref, team),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Team statistics
                     TeamStatsSection(
                       stats: team.stats,
                       onEdit: () => _editTeamStats(context, ref, team),
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Team players section
-                    TeamPlayersSection(
-                      teamId: teamId,
-                      players: teamPlayers,
-                    ),
+                    TeamPlayersSection(teamId: teamId, players: teamPlayers),
                   ],
                 ),
               ),
@@ -86,19 +87,20 @@ class TeamDetailScreen extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, stackTrace) => Scaffold(
-        appBar: AppBar(title: const Text('Error')),
-        body: Center(child: Text('Error loading team: $error')),
-      ),
+      loading:
+          () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error:
+          (error, stackTrace) => Scaffold(
+            appBar: AppBar(title: const Text('Error')),
+            body: Center(child: Text('Error loading team: $error')),
+          ),
     );
   }
 
   Widget _buildLeagueSection(BuildContext context, WidgetRef ref, Team team) {
     final theme = Theme.of(context);
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -117,14 +119,23 @@ class TeamDetailScreen extends ConsumerWidget {
             ),
             const Divider(),
             if (team.currentLeague != null)
-              ListTile(
-                leading: team.currentLeague!.logoUrl != null
-                    ? CircleAvatar(
-                        backgroundImage: NetworkImage(team.currentLeague!.logoUrl!),
-                      )
-                    : const CircleAvatar(child: Icon(Icons.sports_basketball)),
-                title: Text(team.currentLeague!.name),
-                subtitle: const Text('Current League'),
+              InkWell(
+                onTap: () => _navigateToLeagueDetail(context, team.id, team.currentLeague!.id),
+                child: ListTile(
+                  leading:
+                      team.currentLeague!.logoUrl != null
+                          ? CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              team.currentLeague!.logoUrl!,
+                            ),
+                          )
+                          : const CircleAvatar(
+                            child: Icon(Icons.sports_basketball),
+                          ),
+                  title: Text(team.currentLeague!.name),
+                  subtitle: const Text('Current League'),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                ),
               )
             else
               const ListTile(
@@ -132,22 +143,33 @@ class TeamDetailScreen extends ConsumerWidget {
                 title: Text('No league selected'),
                 subtitle: Text('Tap edit to select a league'),
               ),
-            
+
             if (team.leagues.isNotEmpty && team.leagues.length > 1) ...[
               const SizedBox(height: 8),
               Text('Previous Leagues', style: theme.textTheme.titleMedium),
               ...team.leagues
-                  .where((league) => 
-                      team.currentLeague == null || 
-                      league.id != team.currentLeague!.id)
-                  .map((league) => ListTile(
-                        leading: league.logoUrl != null
-                            ? CircleAvatar(
-                                backgroundImage: NetworkImage(league.logoUrl!),
-                              )
-                            : const CircleAvatar(child: Icon(Icons.sports_basketball)),
+                  .where(
+                    (league) =>
+                        team.currentLeague == null ||
+                        league.id != team.currentLeague!.id,
+                  )
+                  .map(
+                    (league) => InkWell(
+                      onTap: () => _navigateToLeagueDetail(context, team.id, league.id),
+                      child: ListTile(
+                        leading:
+                            league.logoUrl != null
+                                ? CircleAvatar(
+                                  backgroundImage: NetworkImage(league.logoUrl!),
+                                )
+                                : const CircleAvatar(
+                                  child: Icon(Icons.sports_basketball),
+                                ),
                         title: Text(league.name),
-                      )),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      ),
+                    ),
+                  ),
             ],
           ],
         ),
@@ -162,7 +184,7 @@ class TeamDetailScreen extends ConsumerWidget {
         fullscreenDialog: true,
       ),
     );
-    
+
     if (result == true) {
       // Refresh data if team was updated
       if (context.mounted) {
@@ -184,23 +206,33 @@ class TeamDetailScreen extends ConsumerWidget {
         );
       },
     );
-    
+
     if (selectedLeague != null) {
       // Update team with the selected league
       List<League> updatedLeagues = List.from(team.leagues);
-      
+
       // Add the league if it's not already in the list
       if (!updatedLeagues.any((league) => league.id == selectedLeague.id)) {
         updatedLeagues.add(selectedLeague);
       }
-      
+
       final updatedTeam = team.copyWith(
         currentLeague: selectedLeague,
         leagues: updatedLeagues,
       );
-      
+
       await teamsViewModel.updateTeam(updatedTeam);
     }
+  }
+
+  void _navigateToLeagueDetail(BuildContext context, String teamId, String leagueId) {
+    context.pushNamed(
+      'leagueDetail',
+      pathParameters: {
+        'teamId': teamId,
+        'leagueId': leagueId,
+      },
+    );
   }
 
   void _editTeamStats(BuildContext context, WidgetRef ref, Team team) async {
@@ -258,7 +290,9 @@ class TeamDetailScreen extends ConsumerWidget {
                   decoration: const InputDecoration(
                     labelText: 'Avg Points Per Game',
                   ),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   initialValue: avgPoints.toString(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {

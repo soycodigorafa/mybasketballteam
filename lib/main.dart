@@ -8,27 +8,37 @@ import 'features/player/models/player.dart';
 import 'features/player/models/player_repository.dart';
 import 'features/team/models/team.dart';
 import 'features/team/models/team_repository.dart';
+import 'features/league/models/match.dart';
 
 void main() async {
   // Ensure Flutter is initialized
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Hive
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   await Hive.initFlutter(appDocumentDir.path);
-  
+
   // Register Hive adapters
   Hive.registerAdapter(PlayerAdapter());
   Hive.registerAdapter(PlayerPositionAdapter());
   Hive.registerAdapter(TeamAdapter());
-  
+  Hive.registerAdapter(MatchAdapter());
+
+  // Open Hive boxes
+  await Hive.openBox<Match>('matches');
+
   // Initialize the repositories
   final playerRepository = HivePlayerRepository();
   await playerRepository.initialize();
-  
+
   final teamRepository = HiveTeamRepository();
   await teamRepository.initialize();
-  
+
+  // Make sure the matches box is open
+  if (!Hive.isBoxOpen('matches')) {
+    await Hive.openBox<Match>('matches');
+  }
+
   // Run the app
   runApp(
     ProviderScope(
@@ -48,7 +58,7 @@ class TeamManagerApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
-    
+
     return MaterialApp.router(
       title: 'Team Manager',
       theme: AppTheme.lightTheme,

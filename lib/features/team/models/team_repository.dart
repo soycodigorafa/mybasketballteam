@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'team.dart';
 import 'team_stats.dart';
+import 'league.dart';
 
 /// Abstract repository interface for managing team data
 abstract class TeamRepository {
@@ -26,17 +27,21 @@ abstract class TeamRepository {
 class HiveTeamRepository implements TeamRepository {
   static const String _boxName = 'teams';
   late Box<Team> _teamsBox;
-  
+
   /// Initialize the Hive box
   Future<void> initialize() async {
     // Register adapters if they haven't been registered yet
+    if (!Hive.isAdapterRegistered(3)) {
+      Hive.registerAdapter(LeagueAdapter());
+    }
+
     if (!Hive.isAdapterRegistered(4)) {
       Hive.registerAdapter(TeamStatsAdapter());
     }
-    
+
     if (!Hive.isBoxOpen(_boxName)) {
       _teamsBox = await Hive.openBox<Team>(_boxName);
-      
+
       // Add sample data if the box is empty
       if (_teamsBox.isEmpty) {
         final sampleTeams = [
@@ -53,7 +58,7 @@ class HiveTeamRepository implements TeamRepository {
             logoUrl: 'https://example.com/warriors.png',
           ),
         ];
-        
+
         for (final team in sampleTeams) {
           await _teamsBox.put(team.id, team);
         }
@@ -62,12 +67,12 @@ class HiveTeamRepository implements TeamRepository {
       _teamsBox = Hive.box<Team>(_boxName);
     }
   }
-  
+
   @override
   List<Team> getAllTeams() {
     return _teamsBox.values.toList();
   }
-  
+
   @override
   Team? getTeamById(String id) {
     return _teamsBox.get(id);
