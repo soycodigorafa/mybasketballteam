@@ -56,6 +56,20 @@ class MatchDetailScreen extends ConsumerWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          context.pushNamed(
+            'postMatchStats',
+            pathParameters: {
+              'teamId': teamId,
+              'leagueId': leagueId,
+              'matchId': matchId,
+            },
+          );
+        },
+        icon: const Icon(Icons.sports_basketball),
+        label: const Text('Add Stats'),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

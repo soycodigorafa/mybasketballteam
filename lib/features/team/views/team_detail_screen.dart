@@ -6,6 +6,8 @@ import '../models/league.dart';
 import '../models/team_stats.dart';
 import '../view_models/teams_view_model.dart';
 import '../../player/view_models/players_view_model.dart';
+import '../../match/views/components/new_game_dialog.dart';
+import '../../match/views/live_stats_screen.dart';
 import 'components/team_info_section.dart';
 import 'components/team_stats_section.dart';
 import 'components/team_players_section.dart';
@@ -41,6 +43,11 @@ class TeamDetailScreen extends ConsumerWidget {
           appBar: AppBar(
             title: Text(team.name),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.sports_basketball),
+                tooltip: 'Live Stats',
+                onPressed: () => _startLiveStats(context, ref, team),
+              ),
               IconButton(
                 icon: const Icon(Icons.edit),
                 onPressed: () => _navigateToEditTeam(context, team),
@@ -338,6 +345,26 @@ class TeamDetailScreen extends ConsumerWidget {
       );
       final updatedTeam = team.copyWith(stats: updatedStats);
       await teamsViewModel.updateTeam(updatedTeam);
+    }
+  }
+  
+  /// Shows dialog to start a live game and navigates to the LiveStatsScreen
+  void _startLiveStats(BuildContext context, WidgetRef ref, Team team) async {
+    final match = await showDialog(
+      context: context,
+      builder: (context) => NewGameDialog(team: team),
+    );
+    
+    if (match != null && context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LiveStatsScreen(
+            teamId: team.id,
+            teamName: team.name,
+          ),
+        ),
+      );
     }
   }
 }
