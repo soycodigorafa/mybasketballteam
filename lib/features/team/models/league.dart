@@ -1,19 +1,13 @@
-import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-part 'league.g.dart';
-
 /// Represents a basketball league
-@HiveType(typeId: 3)
+/// Represents a basketball league
 class League {
-  @HiveField(0)
-  final String id;
+    final String id;
   
-  @HiveField(1)
-  final String name;
+    final String name;
   
-  @HiveField(2)
-  final String? logoUrl;
+    final String? logoUrl;
 
   League({
     String? id,

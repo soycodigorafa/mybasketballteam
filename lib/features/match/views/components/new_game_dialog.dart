@@ -60,7 +60,7 @@ class _NewGameDialogState extends ConsumerState<NewGameDialog> {
                       value: leagueId.id,
                       // Just show the league ID as the name for now
                       // In a real app, you'd fetch the league details
-                      child: Text('League $leagueId'),
+                      child: Text(leagueId.name),
                     );
                   }).toList(),
               onChanged: (value) {

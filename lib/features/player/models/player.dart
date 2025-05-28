@@ -1,21 +1,12 @@
 import 'package:uuid/uuid.dart';
-import 'package:hive/hive.dart';
-
-part 'player.g.dart';
 
 /// Basketball player positions
-@HiveType(typeId: 1)
 enum PlayerPosition {
-  @HiveField(1)
-  pointGuard, // Base
-  @HiveField(2)
-  shootingGuard, // Escolta
-  @HiveField(3)
-  smallForward, // Alero
-  @HiveField(4)
-  powerForward, // Ala-Pivot
-  @HiveField(5)
-  center; // Pivot
+    pointGuard, // Base
+    shootingGuard, // Escolta
+    smallForward, // Alero
+    powerForward, // Ala-Pivot
+    center; // Pivot
 
   String get displayName {
     switch (this) {
@@ -43,34 +34,24 @@ enum PlayerPosition {
 }
 
 /// Represents a basketball player in the team
-@HiveType(typeId: 0)
 class Player {
-  @HiveField(0)
-  final String id;
+    final String id;
 
-  @HiveField(1)
-  final String name;
+    final String name;
 
-  @HiveField(2)
-  final int number;
+    final int number;
 
-  @HiveField(3)
-  final PlayerPosition position;
+    final PlayerPosition position;
 
-  @HiveField(4)
-  final String teamId;
+    final String teamId;
 
-  @HiveField(5)
-  final int? age;
+    final int? age;
 
-  @HiveField(6)
-  final double? height; // in cm
+    final double? height; // in cm
 
-  @HiveField(7)
-  final double? weight; // in kg
+    final double? weight; // in kg
 
-  @HiveField(8)
-  final String? photoUrl;
+    final String? photoUrl;
 
   Player({
     String? id,

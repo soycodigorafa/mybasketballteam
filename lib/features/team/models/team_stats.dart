@@ -1,18 +1,13 @@
-import 'package:hive/hive.dart';
 
-part 'team_stats.g.dart';
 
 /// Represents team statistics
-@HiveType(typeId: 4)
+/// Represents team statistics
 class TeamStats {
-  @HiveField(0)
-  final int wins;
+    final int wins;
   
-  @HiveField(1)
-  final int losses;
+    final int losses;
   
-  @HiveField(2)
-  final double avgPointsPerGame;
+    final double avgPointsPerGame;
 
   TeamStats({
     this.wins = 0,

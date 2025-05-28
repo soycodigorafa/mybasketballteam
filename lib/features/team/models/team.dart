@@ -1,37 +1,24 @@
-import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import 'league.dart';
 import 'team_stats.dart';
 
-part 'team.g.dart';
-
-
-
 /// Represents a basketball team
-@HiveType(typeId: 2)
+/// Represents a basketball team
 class Team {
-  @HiveField(0)
   final String id;
-  
-  @HiveField(1)
+
   final String name;
-  
-  @HiveField(2)
+
   final String? logoUrl;
-  
-  @HiveField(3)
+
   final String? description;
-  
-  @HiveField(4)
+
   final String? coachName;
-  
-  @HiveField(5)
+
   final League? currentLeague;
-  
-  @HiveField(6)
+
   final List<League> leagues;
-  
-  @HiveField(7)
+
   final TeamStats stats;
 
   Team({
@@ -43,9 +30,8 @@ class Team {
     this.currentLeague,
     this.leagues = const [],
     TeamStats? stats,
-  }) : 
-    id = id ?? const Uuid().v4(),
-    stats = stats ?? TeamStats();
+  }) : id = id ?? const Uuid().v4(),
+       stats = stats ?? TeamStats();
 
   Team copyWith({
     String? name,
@@ -88,15 +74,19 @@ class Team {
       logoUrl: json['logoUrl'] as String?,
       description: json['description'] as String?,
       coachName: json['coachName'] as String?,
-      currentLeague: json['currentLeague'] != null
-          ? League.fromJson(json['currentLeague'] as Map<String, dynamic>)
-          : null,
-      leagues: (json['leagues'] as List<dynamic>?)
-          ?.map((e) => League.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
-      stats: json['stats'] != null
-          ? TeamStats.fromJson(json['stats'] as Map<String, dynamic>)
-          : TeamStats(),
+      currentLeague:
+          json['currentLeague'] != null
+              ? League.fromJson(json['currentLeague'] as Map<String, dynamic>)
+              : null,
+      leagues:
+          (json['leagues'] as List<dynamic>?)
+              ?.map((e) => League.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      stats:
+          json['stats'] != null
+              ? TeamStats.fromJson(json['stats'] as Map<String, dynamic>)
+              : TeamStats(),
     );
   }
 }
