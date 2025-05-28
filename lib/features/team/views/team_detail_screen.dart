@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mybasketteam/features/live_stats/views/live_stats_screen.dart';
 import '../models/team.dart';
 import '../models/league.dart';
 import '../models/team_stats.dart';
 import '../view_models/teams_view_model.dart';
 import '../../player/view_models/players_view_model.dart';
 import '../../match/views/components/new_game_dialog.dart';
-import '../../match/views/live_stats_screen.dart';
 import 'components/team_info_section.dart';
 import 'components/team_stats_section.dart';
 import 'components/team_players_section.dart';
@@ -127,7 +127,12 @@ class TeamDetailScreen extends ConsumerWidget {
             const Divider(),
             if (team.currentLeague != null)
               InkWell(
-                onTap: () => _navigateToLeagueDetail(context, team.id, team.currentLeague!.id),
+                onTap:
+                    () => _navigateToLeagueDetail(
+                      context,
+                      team.id,
+                      team.currentLeague!.id,
+                    ),
                 child: ListTile(
                   leading:
                       team.currentLeague!.logoUrl != null
@@ -162,12 +167,19 @@ class TeamDetailScreen extends ConsumerWidget {
                   )
                   .map(
                     (league) => InkWell(
-                      onTap: () => _navigateToLeagueDetail(context, team.id, league.id),
+                      onTap:
+                          () => _navigateToLeagueDetail(
+                            context,
+                            team.id,
+                            league.id,
+                          ),
                       child: ListTile(
                         leading:
                             league.logoUrl != null
                                 ? CircleAvatar(
-                                  backgroundImage: NetworkImage(league.logoUrl!),
+                                  backgroundImage: NetworkImage(
+                                    league.logoUrl!,
+                                  ),
                                 )
                                 : const CircleAvatar(
                                   child: Icon(Icons.sports_basketball),
@@ -232,13 +244,14 @@ class TeamDetailScreen extends ConsumerWidget {
     }
   }
 
-  void _navigateToLeagueDetail(BuildContext context, String teamId, String leagueId) {
+  void _navigateToLeagueDetail(
+    BuildContext context,
+    String teamId,
+    String leagueId,
+  ) {
     context.pushNamed(
       'leagueDetail',
-      pathParameters: {
-        'teamId': teamId,
-        'leagueId': leagueId,
-      },
+      pathParameters: {'teamId': teamId, 'leagueId': leagueId},
     );
   }
 
@@ -347,22 +360,21 @@ class TeamDetailScreen extends ConsumerWidget {
       await teamsViewModel.updateTeam(updatedTeam);
     }
   }
-  
+
   /// Shows dialog to start a live game and navigates to the LiveStatsScreen
   void _startLiveStats(BuildContext context, WidgetRef ref, Team team) async {
     final match = await showDialog(
       context: context,
       builder: (context) => NewGameDialog(team: team),
     );
-    
+
     if (match != null && context.mounted) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LiveStatsScreen(
-            teamId: team.id,
-            teamName: team.name,
-          ),
+          builder:
+              (context) =>
+                  LiveStatsScreen(teamId: team.id, teamName: team.name),
         ),
       );
     }
