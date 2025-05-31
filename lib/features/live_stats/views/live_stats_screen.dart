@@ -7,6 +7,7 @@ import 'package:mybasketteam/features/live_stats/widgets/score_display.dart';
 import 'package:mybasketteam/features/live_stats/widgets/actions_list.dart';
 import 'package:mybasketteam/features/live_stats/widgets/action_buttons.dart';
 import 'package:mybasketteam/features/live_stats/widgets/player_selection_panel.dart';
+import 'package:mybasketteam/features/live_stats/widgets/ai_advice_panel.dart';
 
 // Feature imports
 import 'package:mybasketteam/features/match/models/models.dart';
@@ -35,6 +36,8 @@ class _LiveStatsScreenState extends ConsumerState<LiveStatsScreen> {
   bool isSelectingPlayer = false;
   ActionType? selectedActionType;
   bool isSelectingHomeTeam = true;
+  bool isShowingAiAdvice = false;
+  String aiAdvice = '';
   final scrollController = ScrollController();
 
   @override
@@ -186,6 +189,35 @@ class _LiveStatsScreenState extends ConsumerState<LiveStatsScreen> {
     ref.read(gameActionsProvider.notifier).removeAction(actionId);
   }
 
+  void _showAiAdvice() {
+    final currentMatch = ref.read(currentLiveMatchProvider);
+    final actions = ref.read(currentMatchActionsProvider);
+    final (homeScore, awayScore) = ref.read(currentScoreProvider);
+    final currentQuarter = ref.read(currentQuarterProvider);
+
+    if (currentMatch != null) {
+      // Generate AI advice using the current game state
+      final advice = generateAiAdvice(
+        recentActions: actions,
+        homeScore: homeScore,
+        awayScore: awayScore,
+        isHomeTeam: isSelectingHomeTeam,
+        currentQuarter: currentQuarter,
+      );
+
+      setState(() {
+        aiAdvice = advice;
+        isShowingAiAdvice = true;
+      });
+    }
+  }
+
+  void _closeAiAdvice() {
+    setState(() {
+      isShowingAiAdvice = false;
+    });
+  }
+
   Future<void> _saveGame() async {
     final currentMatch = ref.read(currentLiveMatchProvider);
     final (homeScore, awayScore) = ref.read(currentScoreProvider);
@@ -258,15 +290,37 @@ class _LiveStatsScreenState extends ConsumerState<LiveStatsScreen> {
             onEndQuarter: _endQuarter,
           ),
 
-          // Game actions list
+          // Game actions list or AI advice panel
           Expanded(
-            child: ActionsList(
-              actions: sortedActions,
-              scrollController: scrollController,
-              onDeleteAction: _deleteAction,
-              getActionTypeString: getActionTypeString,
-            ),
+            child:
+                isShowingAiAdvice
+                    ? AiAdvicePanel(advice: aiAdvice, onClose: _closeAiAdvice)
+                    : ActionsList(
+                      actions: sortedActions,
+                      scrollController: scrollController,
+                      onDeleteAction: _deleteAction,
+                      getActionTypeString: getActionTypeString,
+                    ),
           ),
+
+          // AI Advice button
+          if (!isSelectingPlayer && !isShowingAiAdvice)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.psychology),
+                label: const Text('Get AI Advice'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                onPressed: _showAiAdvice,
+              ),
+            ),
 
           // Bottom panel - either action buttons or player selection
           if (isSelectingPlayer)
