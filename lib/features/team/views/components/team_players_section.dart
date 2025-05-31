@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../player/models/player.dart';
-import '../../../player/view_models/players_view_model.dart';
-import '../../../player/views/add_player_screen.dart';
+import 'package:mybasketteam/core/models/app_models.dart';
+import 'package:mybasketteam/features/player/providers/players_providers.dart';
+import 'package:mybasketteam/features/player/views/add_player_screen.dart';
 
 /// Component to display and manage team players
 class TeamPlayersSection extends ConsumerWidget {
@@ -10,7 +10,7 @@ class TeamPlayersSection extends ConsumerWidget {
   final List<Player> players;
 
   const TeamPlayersSection({
-    super.key, 
+    super.key,
     required this.teamId,
     required this.players,
   });
@@ -18,7 +18,7 @@ class TeamPlayersSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -28,10 +28,7 @@ class TeamPlayersSection extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Team Players', 
-                  style: theme.textTheme.titleLarge,
-                ),
+                Text('Team Players', style: theme.textTheme.titleLarge),
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () => _addPlayer(context),
@@ -39,13 +36,11 @@ class TeamPlayersSection extends ConsumerWidget {
               ],
             ),
             const Divider(),
-            
+
             if (players.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 32.0),
-                child: Center(
-                  child: Text('No players in the team yet'),
-                ),
+                child: Center(child: Text('No players in the team yet')),
               )
             else
               ListView.builder(
@@ -65,7 +60,7 @@ class TeamPlayersSection extends ConsumerWidget {
 
   Widget _buildPlayerCard(BuildContext context, WidgetRef ref, Player player) {
     final theme = Theme.of(context);
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Padding(
@@ -92,7 +87,7 @@ class TeamPlayersSection extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 16),
-            
+
             // Player details
             Expanded(
               child: Column(
@@ -111,9 +106,13 @@ class TeamPlayersSection extends ConsumerWidget {
                       color: theme.colorScheme.secondary,
                     ),
                   ),
-                  if (player.age != null || player.height != null || player.weight != null)
+                  if (player.age != null ||
+                      player.height != null ||
+                      player.weight != null)
                     const SizedBox(height: 4),
-                  if (player.age != null || player.height != null || player.weight != null)
+                  if (player.age != null ||
+                      player.height != null ||
+                      player.weight != null)
                     Row(
                       children: [
                         if (player.age != null)
@@ -127,7 +126,7 @@ class TeamPlayersSection extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             // Actions
             Row(
               children: [
@@ -157,10 +156,7 @@ class TeamPlayersSection extends ConsumerWidget {
       ),
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 12,
-          color: Colors.black87,
-        ),
+        style: const TextStyle(fontSize: 12, color: Colors.black87),
       ),
     );
   }
@@ -177,13 +173,15 @@ class TeamPlayersSection extends ConsumerWidget {
   void _editPlayer(BuildContext context, Player player) {
     // TODO: Implement edit player screen
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Edit player functionality coming soon'),
-      ),
+      const SnackBar(content: Text('Edit player functionality coming soon')),
     );
   }
 
-  void _confirmDeletePlayer(BuildContext context, WidgetRef ref, Player player) {
+  void _confirmDeletePlayer(
+    BuildContext context,
+    WidgetRef ref,
+    Player player,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

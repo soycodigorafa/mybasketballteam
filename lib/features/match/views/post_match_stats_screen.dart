@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../models/player_stats.dart';
 import '../models/player_stats_repository.dart';
-import '../models/match.dart';
+import '../models/game_match.dart';
 import '../models/match_repository.dart';
 import '../../player/models/player.dart';
 import '../../player/models/player_repository.dart';
@@ -28,7 +28,7 @@ class PostMatchStatsScreen extends ConsumerStatefulWidget {
 
 class _PostMatchStatsScreenState extends ConsumerState<PostMatchStatsScreen> {
   final _formKey = GlobalKey<FormState>();
-  late Match match;
+  late GameMatch match;
 
   // Controllers for adding new player
   final _newPlayerNameController = TextEditingController();

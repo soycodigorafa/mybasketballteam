@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../widgets/score_display.dart';
-import '../widgets/actions_list.dart';
-import '../widgets/action_buttons.dart';
-import '../widgets/player_selection_panel.dart';
-import '../../match/models/game_action.dart';
-import '../../match/models/match.dart';
-import '../../match/view_models/live_game_view_model.dart';
-import '../../player/models/player.dart';
-import '../../player/view_models/players_view_model.dart';
+// Local widgets
+import 'package:mybasketteam/features/live_stats/widgets/score_display.dart';
+import 'package:mybasketteam/features/live_stats/widgets/actions_list.dart';
+import 'package:mybasketteam/features/live_stats/widgets/action_buttons.dart';
+import 'package:mybasketteam/features/live_stats/widgets/player_selection_panel.dart';
+
+// Feature imports
+import 'package:mybasketteam/features/match/models/models.dart';
+import 'package:mybasketteam/features/match/providers/live_game_providers.dart';
+import 'package:mybasketteam/features/player/models/player.dart';
+import 'package:mybasketteam/features/player/providers/players_providers.dart';
 
 class LiveStatsScreen extends ConsumerStatefulWidget {
   final String teamId;
@@ -29,7 +31,7 @@ class LiveStatsScreen extends ConsumerStatefulWidget {
 }
 
 class _LiveStatsScreenState extends ConsumerState<LiveStatsScreen> {
-  late Match currentMatch;
+  late GameMatch currentMatch;
   bool isSelectingPlayer = false;
   ActionType? selectedActionType;
   bool isSelectingHomeTeam = true;
@@ -290,6 +292,8 @@ String getActionTypeString(ActionType type) {
       return '2 Points';
     case ActionType.threePoint:
       return '3 Points';
+    case ActionType.freeThrow:
+      return 'Free Throw';
     case ActionType.foul:
       return 'Foul';
     case ActionType.turnover:

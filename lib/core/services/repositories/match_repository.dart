@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../match/models/game_match.dart';
+import '../../../features/match/models/models.dart';
 
 /// Abstract repository interface for managing match data
 abstract class MatchRepository {
@@ -31,7 +31,7 @@ class InMemoryMatchRepository implements MatchRepository {
     // Initialize with sample data
     final sampleMatches = [
       GameMatch(
-        id: 'match-1',
+        id: 'match-1',  // Add explicit IDs for sample data
         leagueId: 'default-league',
         homeTeamId: 'default-team',
         homeTeamName: 'Lakers',
@@ -43,7 +43,7 @@ class InMemoryMatchRepository implements MatchRepository {
         location: 'Staples Center',
       ),
       GameMatch(
-        id: 'match-2',
+        id: 'match-2',  // Add explicit IDs for sample data
         leagueId: 'default-league',
         homeTeamId: 'default-team-2',
         homeTeamName: 'Warriors',

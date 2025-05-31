@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../models/match.dart';
-import '../models/match_repository.dart';
-import '../models/player_stats.dart';
-import '../models/player_stats_repository.dart';
-import '../view_models/matches_view_model.dart';
-// Import for league provider - uncomment if league_repository.dart exists
-// import '../../league/models/league_repository.dart' show leagueByIdProvider;
+
+// Import models using our export file to avoid naming conflicts
+import '../models/models.dart';
+
+// Repositories - centralized in core
+import '../../../core/services/repositories/repositories.dart';
+
+// Providers (formerly view_models)
+import '../providers/matches_providers.dart';
 
 /// Screen that displays detailed match information
 class MatchDetailScreen extends ConsumerWidget {
@@ -26,7 +28,7 @@ class MatchDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Use the matchesProvider to find the match by ID
     final allMatches = ref.watch(matchesProvider);
-    late final Match match;
+    late final GameMatch match;
 
     try {
       match = allMatches.firstWhere((m) => m.id == matchId);
@@ -217,7 +219,7 @@ class MatchDetailScreen extends ConsumerWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  String _getResultText(Match match, String teamId) {
+  String _getResultText(GameMatch match, String teamId) {
     bool isHomeTeam = match.homeTeamId == teamId;
     bool isAwayTeam = match.awayTeamId == teamId;
 
@@ -252,7 +254,7 @@ class MatchDetailScreen extends ConsumerWidget {
     }
   }
 
-  Color _getResultColor(Match match, String teamId) {
+  Color _getResultColor(GameMatch match, String teamId) {
     bool isHomeTeam = match.homeTeamId == teamId;
     bool isAwayTeam = match.awayTeamId == teamId;
 
@@ -279,7 +281,7 @@ class MatchDetailScreen extends ConsumerWidget {
     }
   }
 
-  void _editMatch(BuildContext context, WidgetRef ref, Match match) async {
+  void _editMatch(BuildContext context, WidgetRef ref, GameMatch match) async {
     // Navigate to edit match screen
     // This would be implemented in a similar way to the AddMatchScreen
     // For now we'll show a simple dialog for demonstration
@@ -288,7 +290,11 @@ class MatchDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _confirmDeleteMatch(BuildContext context, WidgetRef ref, Match match) {
+  void _confirmDeleteMatch(
+    BuildContext context,
+    WidgetRef ref,
+    GameMatch match,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -317,7 +323,11 @@ class MatchDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _deleteMatch(BuildContext context, WidgetRef ref, Match match) async {
+  void _deleteMatch(
+    BuildContext context,
+    WidgetRef ref,
+    GameMatch match,
+  ) async {
     await ref.read(matchesViewModelProvider.notifier).deleteMatch(match.id);
 
     if (context.mounted) {

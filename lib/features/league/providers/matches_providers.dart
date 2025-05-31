@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/match.dart';
+import '../../match/models/game_match.dart';
 import '../models/match_repository.dart';
 import '../../team/models/league.dart';
 import '../../team/models/team_repository.dart';
@@ -8,7 +8,7 @@ import '../../team/models/team_repository.dart';
 final matchChangeNotifierProvider = StateProvider<int>((ref) => 0);
 
 /// Provider for sorted matches by league ID
-final sortedMatchesByLeagueProvider = Provider.family<List<Match>, String>((
+final sortedMatchesByLeagueProvider = Provider.family<List<GameMatch>, String>((
   ref,
   leagueId,
 ) {
@@ -39,13 +39,13 @@ final leagueByIdProvider = Provider.family<League?, String>((ref, leagueId) {
 
 /// Provider for the matches view model
 final matchesViewModelProvider =
-    StateNotifierProvider<MatchesViewModel, List<Match>>((ref) {
+    StateNotifierProvider<MatchesViewModel, List<GameMatch>>((ref) {
       final repository = ref.watch(matchRepositoryProvider);
       return MatchesViewModel(repository, ref);
     });
 
 /// Provider for all matches, refreshes when notifier changes
-final allMatchesProvider = Provider<List<Match>>((ref) {
+final allMatchesProvider = Provider<List<GameMatch>>((ref) {
   // Watch the change notifier to force refresh
   ref.watch(matchChangeNotifierProvider);
   final repository = ref.watch(matchRepositoryProvider);
@@ -53,7 +53,7 @@ final allMatchesProvider = Provider<List<Match>>((ref) {
 });
 
 /// Provider for matches filtered by league ID
-final matchesByLeagueProvider = Provider.family<List<Match>, String>((
+final matchesByLeagueProvider = Provider.family<List<GameMatch>, String>((
   ref,
   leagueId,
 ) {
@@ -64,7 +64,7 @@ final matchesByLeagueProvider = Provider.family<List<Match>, String>((
 });
 
 /// ViewModel for matches
-class MatchesViewModel extends StateNotifier<List<Match>> {
+class MatchesViewModel extends StateNotifier<List<GameMatch>> {
   final MatchRepository _repository;
   final Ref _ref;
 
@@ -78,7 +78,7 @@ class MatchesViewModel extends StateNotifier<List<Match>> {
   }
 
   /// Add a new match
-  Future<void> addMatch(Match match) async {
+  Future<void> addMatch(GameMatch match) async {
     await _repository.addMatch(match);
     _loadMatches();
     // Notify all dependent providers about the change
@@ -86,7 +86,7 @@ class MatchesViewModel extends StateNotifier<List<Match>> {
   }
 
   /// Update an existing match
-  Future<void> updateMatch(Match match) async {
+  Future<void> updateMatch(GameMatch match) async {
     await _repository.updateMatch(match);
     _loadMatches();
     // Notify all dependent providers about the change

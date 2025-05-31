@@ -1,8 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../match/models/game_match.dart';
-import '../models/match_repository.dart';
+
+// Import models using our export file to avoid naming conflicts
+import '../models/models.dart';
+
+// Repositories now centralized in core
+import '../../../core/services/repositories/repositories.dart' hide teamsProvider;
 import '../../team/models/league.dart';
-import '../../team/models/team_repository.dart';
+import '../../team/providers/teams_providers.dart';
 
 /// Global counter to force refresh of all match-related providers
 final matchChangeNotifierProvider = StateProvider<int>((ref) => 0);

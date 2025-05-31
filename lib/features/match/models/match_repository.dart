@@ -1,22 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'match.dart';
+import 'game_match.dart';
 
 /// Abstract repository interface for managing match data
 abstract class MatchRepository {
   /// Get all matches
-  List<Match> getAllMatches();
+  List<GameMatch> getAllMatches();
 
   /// Get matches by league ID
-  List<Match> getMatchesByLeagueId(String leagueId);
+  List<GameMatch> getMatchesByLeagueId(String leagueId);
 
   /// Get matches by team ID
-  List<Match> getMatchesByTeamId(String teamId);
+  List<GameMatch> getMatchesByTeamId(String teamId);
 
   /// Add a new match
-  Future<void> addMatch(Match match);
+  Future<void> addMatch(GameMatch match);
 
   /// Update an existing match
-  Future<void> updateMatch(Match match);
+  Future<void> updateMatch(GameMatch match);
 
   /// Delete a match
   Future<void> deleteMatch(String id);
@@ -25,12 +25,13 @@ abstract class MatchRepository {
 /// In-memory implementation of MatchRepository
 class InMemoryMatchRepository implements MatchRepository {
   // In-memory storage for matches
-  final Map<String, Match> _matches = {};
+  final Map<String, GameMatch> _matches = {};
 
   InMemoryMatchRepository() {
     // Initialize with sample data
     final sampleMatches = [
-      Match(
+      GameMatch(
+        id: 'match-1',
         leagueId: 'default-league',
         homeTeamId: 'default-team',
         homeTeamName: 'Lakers',
@@ -41,7 +42,8 @@ class InMemoryMatchRepository implements MatchRepository {
         date: DateTime.now().subtract(const Duration(days: 3)),
         location: 'Staples Center',
       ),
-      Match(
+      GameMatch(
+        id: 'match-2',
         leagueId: 'default-league',
         homeTeamId: 'default-team-2',
         homeTeamName: 'Warriors',
@@ -60,19 +62,19 @@ class InMemoryMatchRepository implements MatchRepository {
   }
 
   @override
-  List<Match> getAllMatches() {
+  List<GameMatch> getAllMatches() {
     return _matches.values.toList();
   }
 
   @override
-  List<Match> getMatchesByLeagueId(String leagueId) {
+  List<GameMatch> getMatchesByLeagueId(String leagueId) {
     return _matches.values
         .where((match) => match.leagueId == leagueId)
         .toList();
   }
 
   @override
-  List<Match> getMatchesByTeamId(String teamId) {
+  List<GameMatch> getMatchesByTeamId(String teamId) {
     return _matches.values
         .where(
           (match) => match.homeTeamId == teamId || match.awayTeamId == teamId,
@@ -81,12 +83,12 @@ class InMemoryMatchRepository implements MatchRepository {
   }
 
   @override
-  Future<void> addMatch(Match match) async {
+  Future<void> addMatch(GameMatch match) async {
     _matches[match.id] = match;
   }
 
   @override
-  Future<void> updateMatch(Match match) async {
+  Future<void> updateMatch(GameMatch match) async {
     if (_matches.containsKey(match.id)) {
       _matches[match.id] = match;
     }
@@ -105,13 +107,13 @@ final matchRepositoryProvider = Provider<MatchRepository>((ref) {
 });
 
 /// Provider for the current list of matches
-final matchesProvider = Provider<List<Match>>((ref) {
+final matchesProvider = Provider<List<GameMatch>>((ref) {
   final repository = ref.watch(matchRepositoryProvider);
   return repository.getAllMatches();
 });
 
 /// Provider for filtering matches by league ID
-final matchesByLeagueProvider = Provider.family<List<Match>, String>((
+final matchesByLeagueProvider = Provider.family<List<GameMatch>, String>((
   ref,
   leagueId,
 ) {
@@ -120,7 +122,7 @@ final matchesByLeagueProvider = Provider.family<List<Match>, String>((
 });
 
 /// Provider for filtering matches by team ID
-final matchesByTeamProvider = Provider.family<List<Match>, String>((
+final matchesByTeamProvider = Provider.family<List<GameMatch>, String>((
   ref,
   teamId,
 ) {

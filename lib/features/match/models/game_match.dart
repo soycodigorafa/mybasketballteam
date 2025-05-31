@@ -1,7 +1,7 @@
 import 'package:uuid/uuid.dart';
 
-/// Represents a basketball match between two teams
-class Match {
+/// GameMatch class to replace the Match class and avoid conflicts with Dart's core Match class
+class GameMatch {
   final String id;
   final String leagueId;
   final String homeTeamId;
@@ -14,7 +14,7 @@ class Match {
   final String? location;
   final String? notes;
 
-  Match({
+  GameMatch({
     String? id,
     required this.leagueId,
     required this.homeTeamId,
@@ -28,7 +28,9 @@ class Match {
     this.notes,
   }) : id = id ?? const Uuid().v4();
 
-  Match copyWith({
+  // Create a copy of this match with some fields updated
+  GameMatch copyWith({
+    String? id,
     String? leagueId,
     String? homeTeamId,
     String? homeTeamName,
@@ -40,8 +42,8 @@ class Match {
     String? location,
     String? notes,
   }) {
-    return Match(
-      id: id,
+    return GameMatch(
+      id: id ?? this.id,
       leagueId: leagueId ?? this.leagueId,
       homeTeamId: homeTeamId ?? this.homeTeamId,
       homeTeamName: homeTeamName ?? this.homeTeamName,
@@ -55,6 +57,7 @@ class Match {
     );
   }
 
+  // Convert match to a map for storage
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -71,8 +74,9 @@ class Match {
     };
   }
 
-  factory Match.fromJson(Map<String, dynamic> json) {
-    return Match(
+  // Create a match from a map
+  factory GameMatch.fromJson(Map<String, dynamic> json) {
+    return GameMatch(
       id: json['id'] as String,
       leagueId: json['leagueId'] as String,
       homeTeamId: json['homeTeamId'] as String,

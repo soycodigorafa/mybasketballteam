@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/game_action.dart';
-import '../models/game_action_repository.dart';
-import '../models/match.dart';
-import '../models/match_repository.dart';
+
+// Use centralized model exports
+import 'package:mybasketteam/features/match/models/models.dart';
+
+// Use centralized repository exports
+import 'package:mybasketteam/core/services/repositories/repositories.dart';
 
 final gameActionsProvider =
     StateNotifierProvider<GameActionNotifier, List<GameAction>>((ref) {
@@ -10,7 +12,7 @@ final gameActionsProvider =
       return GameActionNotifier(repository);
     });
 
-final currentLiveMatchProvider = StateProvider<Match?>((ref) => null);
+final currentLiveMatchProvider = StateProvider<GameMatch?>((ref) => null);
 
 final currentQuarterProvider = StateProvider<int>((ref) => 1);
 
@@ -89,7 +91,7 @@ class LiveGameManager {
   LiveGameManager(this._matchRepository);
 
   // Create a new match or update an existing one based on live game stats
-  Future<Match> saveMatchFromLiveStats({
+  Future<GameMatch> saveMatchFromLiveStats({
     required String? matchId,
     required String homeTeamId,
     required String homeTeamName,
@@ -109,10 +111,20 @@ class LiveGameManager {
       final matchIndex = existingMatches.indexWhere((m) => m.id == matchId);
 
       if (matchIndex != -1) {
-        final updatedMatch = existingMatches[matchIndex].copyWith(
-          homeTeamScore: homeScore,
-          awayTeamScore: awayScore,
-          notes: notes,
+        // Create a new GameMatch with updated fields
+        final existingMatch = existingMatches[matchIndex];
+        final updatedMatch = GameMatch(
+          id: existingMatch.id,
+          leagueId: existingMatch.leagueId,
+          homeTeamId: existingMatch.homeTeamId,
+          homeTeamName: existingMatch.homeTeamName,
+          homeTeamScore: homeScore,  // Updated score
+          awayTeamId: existingMatch.awayTeamId,
+          awayTeamName: existingMatch.awayTeamName,
+          awayTeamScore: awayScore,  // Updated score
+          date: existingMatch.date,
+          location: existingMatch.location,
+          notes: notes,  // Updated notes
         );
 
         await _matchRepository.updateMatch(updatedMatch);
@@ -121,7 +133,7 @@ class LiveGameManager {
     }
 
     // Create new match
-    final newMatch = Match(
+    final newMatch = GameMatch(
       leagueId: leagueId,
       homeTeamId: homeTeamId,
       homeTeamName: homeTeamName,

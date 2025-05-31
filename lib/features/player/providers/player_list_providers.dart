@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Use models directly from player feature
 import '../models/player.dart';
-import '../models/player_repository.dart';
+
+// Use centralized repositories
+import '../../../core/services/repositories/repositories.dart';
 
 /// ViewModel for the player list screen
 class PlayerListViewModel extends StateNotifier<List<Player>> {

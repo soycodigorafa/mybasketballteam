@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../models/match.dart';
-import '../view_models/matches_view_model.dart';
-import '../../team/view_models/teams_view_model.dart';
+import 'package:mybasketteam/core/models/app_models.dart';
+import 'package:mybasketteam/core/providers/app_providers.dart';
 
 /// Screen for adding a new match
 class AddMatchScreen extends ConsumerStatefulWidget {
@@ -352,7 +351,7 @@ class _AddMatchScreenState extends ConsumerState<AddMatchScreen> {
       }
 
       // When using text input for away team, always use 'manual_entry' as the ID
-      final match = Match(
+      final match = GameMatch(
         leagueId: widget.leagueId,
         homeTeamId: _homeTeamId,
         homeTeamName: _homeTeamName,

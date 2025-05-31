@@ -1,12 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/team.dart';
-import '../models/team_repository.dart';
 
-/// ViewModel for managing teams
-class TeamsViewModel extends StateNotifier<List<Team>> {
+import 'package:mybasketteam/core/services/repositories/team_repository.dart';
+import 'package:mybasketteam/features/team/models/team.dart';
+
+/// Notifier for managing teams
+class TeamsNotifier extends StateNotifier<List<Team>> {
   final TeamRepository _repository;
 
-  TeamsViewModel(this._repository) : super(_repository.getAllTeams());
+  TeamsNotifier(this._repository) : super(_repository.getAllTeams());
 
   /// Add a new team
   Future<void> addTeam(Team team) async {
@@ -40,19 +41,23 @@ class TeamsViewModel extends StateNotifier<List<Team>> {
   }
 }
 
-/// Provider for the TeamsViewModel
-final teamsProvider = StateNotifierProvider<TeamsViewModel, List<Team>>((
-  ref,
-) {
+/// Provider for the TeamsNotifier
+final teamsNotifierProvider = StateNotifierProvider<TeamsNotifier, List<Team>>((ref) {
   final repository = ref.watch(teamRepositoryProvider);
-  return TeamsViewModel(repository);
+  return TeamsNotifier(repository);
 });
 
 /// Provider for a specific team by ID
 final teamByIdProvider = Provider.family<Team?, String>((ref, id) {
-  final teams = ref.watch(teamsProvider);
-  return teams.firstWhere(
-    (team) => team.id == id,
-    orElse: () => throw Exception('Team not found'),
-  );
+  final teams = ref.watch(teamsNotifierProvider);
+  try {
+    return teams.firstWhere((team) => team.id == id);
+  } catch (e) {
+    return null;
+  }
+});
+
+/// Provider for accessing all teams
+final teamsProvider = Provider<List<Team>>((ref) {
+  return ref.watch(teamsNotifierProvider);
 });

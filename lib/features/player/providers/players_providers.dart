@@ -1,6 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/player.dart';
-import '../models/player_repository.dart';
+
+// Use models directly from player feature
+import 'package:mybasketteam/features/player/models/player.dart';
+
+// Use centralized repositories
+import 'package:mybasketteam/core/services/repositories/repositories.dart';
 
 /// ViewModel for managing players
 class PlayersViewModel extends StateNotifier<List<Player>> {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/player.dart';
-import '../view_models/players_view_model.dart';
+import 'package:mybasketteam/core/models/app_models.dart';
+import 'package:mybasketteam/features/player/providers/players_providers.dart';
 
 /// Screen with a form to add a new player
 class AddPlayerScreen extends ConsumerStatefulWidget {

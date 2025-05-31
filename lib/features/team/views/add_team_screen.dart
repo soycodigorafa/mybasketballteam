@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/team.dart';
-import '../view_models/teams_view_model.dart';
+import '../providers/teams_providers.dart';
 
 /// Screen with a form to add a new team
 class AddTeamScreen extends ConsumerStatefulWidget {
@@ -50,7 +50,7 @@ class _AddTeamScreenState extends ConsumerState<AddTeamScreen> {
         );
 
         // Add the team using the TeamsViewModel
-        await ref.read(teamsProvider.notifier).addTeam(team);
+        await ref.read(teamsNotifierProvider.notifier).addTeam(team);
 
         // Show success message and navigate back
         if (mounted) {

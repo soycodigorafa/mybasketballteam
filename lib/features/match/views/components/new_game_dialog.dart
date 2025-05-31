@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../models/match.dart';
-import '../../view_models/live_game_view_model.dart';
-import '../../../team/models/team.dart';
+import 'package:mybasketteam/core/models/app_models.dart';
+import 'package:mybasketteam/core/providers/app_providers.dart';
 
 class NewGameDialog extends ConsumerStatefulWidget {
   final Team team;
@@ -108,7 +107,7 @@ class _NewGameDialogState extends ConsumerState<NewGameDialog> {
     if (_formKey.currentState!.validate()) {
       if (_selectedLeagueId != null) {
         // Create a new match
-        final newMatch = Match(
+        final newMatch = GameMatch(
           leagueId: _selectedLeagueId!,
           homeTeamId: widget.team.id,
           homeTeamName: widget.team.name,

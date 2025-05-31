@@ -23,63 +23,60 @@ class PlayerSelectionPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Theme.of(context).colorScheme.surfaceVariant,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Select Player',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              Row(
-                children: [
-                  Text(
-                    isSelectingHomeTeam ? 'Home' : 'Away',
-                    style: TextStyle(
-                      color: isSelectingHomeTeam
-                          ? Colors.blue
-                          : Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.swap_horiz),
-                    onPressed: onToggleTeam,
-                    tooltip: 'Switch Teams',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: onCancel,
-                    tooltip: 'Cancel',
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          if (isSelectingHomeTeam)
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                for (final player in players)
-                  PlayerChip(
-                    player: player,
-                    onSelected: onPlayerSelected,
-                  ),
+                Text(
+                  'Select Player',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      isSelectingHomeTeam ? 'Home' : 'Away',
+                      style: TextStyle(
+                        color: isSelectingHomeTeam ? Colors.blue : Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.swap_horiz),
+                      onPressed: onToggleTeam,
+                      tooltip: 'Switch Teams',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: onCancel,
+                      tooltip: 'Cancel',
+                    ),
+                  ],
+                ),
               ],
-            )
-          else
-            ElevatedButton(
-              onPressed: onOpponentSelected,
-              child: const Text('Enter Opponent Player'),
             ),
-        ],
+            const SizedBox(height: 8),
+            if (isSelectingHomeTeam)
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final player in players)
+                    PlayerChip(player: player, onSelected: onPlayerSelected),
+                ],
+              )
+            else
+              ElevatedButton(
+                onPressed: onOpponentSelected,
+                child: const Text('Enter Opponent Player'),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -89,11 +86,7 @@ class PlayerChip extends StatelessWidget {
   final Player player;
   final Function(Player) onSelected;
 
-  const PlayerChip({
-    super.key,
-    required this.player,
-    required this.onSelected,
-  });
+  const PlayerChip({super.key, required this.player, required this.onSelected});
 
   @override
   Widget build(BuildContext context) {

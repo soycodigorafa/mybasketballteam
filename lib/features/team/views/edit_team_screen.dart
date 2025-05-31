@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/team.dart';
-import '../view_models/teams_view_model.dart';
+import '../providers/teams_providers.dart';
 
 /// Screen for editing team information
 class EditTeamScreen extends ConsumerStatefulWidget {
@@ -169,7 +169,7 @@ class _EditTeamScreenState extends ConsumerState<EditTeamScreen> {
 
   Future<void> _saveTeam() async {
     if (_formKey.currentState!.validate()) {
-      final teamsViewModel = ref.read(teamsProvider.notifier);
+      final teamsViewModel = ref.read(teamsNotifierProvider.notifier);
       
       final updatedTeam = widget.team.copyWith(
         name: _nameController.text.trim(),

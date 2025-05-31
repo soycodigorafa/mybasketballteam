@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mybasketteam/features/live_stats/views/live_stats_screen.dart';
-import '../models/team.dart';
-import '../models/league.dart';
-import '../models/team_stats.dart';
-import '../view_models/teams_view_model.dart';
-import '../../player/view_models/players_view_model.dart';
-import '../../match/views/components/new_game_dialog.dart';
-import 'components/team_info_section.dart';
-import 'components/team_stats_section.dart';
-import 'components/team_players_section.dart';
-import 'components/league_selection_dialog.dart';
-import 'edit_team_screen.dart';
+
+// Use centralized model exports
+import 'package:mybasketteam/core/models/app_models.dart';
+
+// Use centralized provider exports
+import 'package:mybasketteam/core/providers/app_providers.dart';
+
+// Views and components
+import 'package:mybasketteam/features/match/views/components/new_game_dialog.dart';
+import 'package:mybasketteam/features/team/views/components/team_info_section.dart';
+import 'package:mybasketteam/features/team/views/components/team_stats_section.dart';
+import 'package:mybasketteam/features/team/views/components/team_players_section.dart';
+import 'package:mybasketteam/features/team/views/components/league_selection_dialog.dart';
+import 'package:mybasketteam/features/team/views/edit_team_screen.dart';
 
 /// Screen that displays detailed team information and allows editing
 class TeamDetailScreen extends ConsumerWidget {
@@ -215,7 +218,7 @@ class TeamDetailScreen extends ConsumerWidget {
   }
 
   void _selectLeague(BuildContext context, WidgetRef ref, Team team) async {
-    final teamsViewModel = ref.read(teamsProvider.notifier);
+    final teamsViewModel = ref.read(teamsNotifierProvider.notifier);
     final League? selectedLeague = await showDialog<League>(
       context: context,
       builder: (BuildContext context) {
@@ -350,7 +353,7 @@ class TeamDetailScreen extends ConsumerWidget {
     );
 
     if (result == true) {
-      final teamsViewModel = ref.read(teamsProvider.notifier);
+      final teamsViewModel = ref.read(teamsNotifierProvider.notifier);
       final updatedStats = TeamStats(
         wins: wins,
         losses: losses,

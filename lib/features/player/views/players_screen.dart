@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+// Models
 import '../models/player.dart';
-import '../view_models/players_view_model.dart';
+
+// Providers (formerly view_models)
+import '../providers/players_providers.dart';
+
+// Views
 import 'add_player_screen.dart';
 
 /// Screen that displays a list of players using the PlayersViewModel

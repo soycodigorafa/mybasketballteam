@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+// Models
 import '../models/team.dart';
-import '../view_models/teams_view_model.dart';
+
+// Providers (formerly view_models)
+import '../providers/teams_providers.dart';
+
+// Views
 import 'add_team_screen.dart';
 
 /// Screen that displays a list of teams

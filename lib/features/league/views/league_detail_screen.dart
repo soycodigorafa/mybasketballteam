@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../team/models/league.dart';
-import '../../match/models/match.dart';
-import '../../match/view_models/matches_view_model.dart';
+import 'package:mybasketteam/features/match/models/game_match.dart';
+import 'package:mybasketteam/features/match/providers/matches_providers.dart';
+import 'package:mybasketteam/features/team/models/league.dart';
 
 /// Screen that displays detailed league information and matches
 class LeagueDetailScreen extends ConsumerStatefulWidget {
@@ -184,7 +184,7 @@ class LeagueHeader extends StatelessWidget {
 
 /// Widget that displays the matches section
 class MatchesSection extends StatelessWidget {
-  final List<Match> matches;
+  final List<GameMatch> matches;
   final VoidCallback onAddMatch;
   final Function(String) onMatchTap;
   final String Function(DateTime) formatDate;
@@ -248,7 +248,7 @@ class MatchesSection extends StatelessWidget {
 
 /// Widget that displays a single match item in the list
 class MatchListItem extends StatelessWidget {
-  final Match match;
+  final GameMatch match;
   final String Function(DateTime) formatDate;
   final VoidCallback onTap;
 

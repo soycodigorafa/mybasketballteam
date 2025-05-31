@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../match/models/game_action.dart';
+import '../../match/models/models.dart'; // Use models export file for consistency
 
 class ActionsList extends StatelessWidget {
   final List<GameAction> actions;
@@ -72,6 +72,8 @@ class ActionItem extends StatelessWidget {
         return const CircleAvatar(child: Text('2P'));
       case ActionType.threePoint:
         return const CircleAvatar(child: Text('3P'));
+      case ActionType.freeThrow:
+        return const CircleAvatar(child: Text('1P'));
       case ActionType.foul:
         return const CircleAvatar(child: Icon(Icons.sports_handball));
       case ActionType.turnover:

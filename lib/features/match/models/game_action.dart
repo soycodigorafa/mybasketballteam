@@ -86,6 +86,7 @@ class GameAction {
 enum ActionType {
   point,        // Regular 2-point shot
   threePoint,   // 3-point shot
+  freeThrow,    // Free throw (1-point)
   foul,         // Foul committed
   turnover,     // Turnover
   rebound,      // Rebound
@@ -102,6 +103,8 @@ int getPointsForAction(ActionType type) {
       return 2;
     case ActionType.threePoint:
       return 3;
+    case ActionType.freeThrow:
+      return 1;
     default:
       return 0;
   }
